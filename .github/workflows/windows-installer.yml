@@ -1,0 +1,49 @@
+name: Build ProfitPilot Setup EXE
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  windows-installer:
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify all app files exist
+        shell: pwsh
+        run: |
+          foreach ($file in @('index.html','main.js','preload.js','package.json')) {
+            if (-not (Test-Path -LiteralPath $file)) { throw "Missing application source: $file" }
+          }
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Verify JavaScript syntax
+        run: |
+          node --check main.js
+          node --check preload.js
+      - name: Build real NSIS installer
+        run: npx electron-builder --win nsis --x64 --publish never
+      - name: Confirm Setup.exe (not unpacked app)
+        shell: pwsh
+        run: |
+          $setups = @(Get-ChildItem -Path dist -File -Filter '*.exe' | Where-Object { $_.Name -like '*Setup*' })
+          if ($setups.Count -ne 1) {
+            Get-ChildItem dist -Recurse | Select-Object FullName
+            throw "Expected one Setup.exe, found $($setups.Count)."
+          }
+          if ($setups[0].Length -lt 1000000) { throw "Installer unexpectedly small" }
+          Write-Host "Verified NSIS installer: $($setups[0].FullName)"
+      - name: Upload installer only
+        uses: actions/upload-artifact@v4
+        with:
+          name: ProfitPilot-Setup-Windows
+          path: dist/*Setup*.exe
+          if-no-files-found: error
+          retention-days: 30
