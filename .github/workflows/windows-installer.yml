@@ -48,6 +48,13 @@ jobs:
           }
           if ($setups[0].Length -lt 1000000) { throw "Installer unexpectedly small" }
           Write-Host "Verified NSIS installer: $($setups[0].FullName)"
+      - name: Upload no-install browser UI preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: ProfitPilot-Browser-Preview-No-EXE
+          path: index.html
+          if-no-files-found: error
+          retention-days: 30
       - name: Upload installer only
         uses: actions/upload-artifact@v4
         with:
