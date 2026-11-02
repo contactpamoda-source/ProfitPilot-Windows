@@ -46,6 +46,24 @@ function restoreBackup(name){if(!backupNamePattern.test(name||''))throw Error('I
 app.whenReady().then(()=>{
  ipcMain.handle('diagnostic:log',async(_e,entry)=>{try{const p=path.join(app.getPath('userData'),'profitpilot-diagnostics.log');const line=JSON.stringify({time:new Date().toISOString(),...entry}).slice(0,1500)+'\\n';await fs.promises.appendFile(p,line);return true}catch{return false}});
  ipcMain.handle('diagnostic:open',async()=>{const p=path.join(app.getPath('userData'),'profitpilot-diagnostics.log');await fs.promises.appendFile(p,'');return shell.showItemInFolder(p)});
+ ipcMain.handle('finance:delete-transaction',async(_e,id)=>{
+  if(typeof id!=='string'||id.length>160)return{ok:false,error:'Invalid transaction ID'};
+  try{
+    const p=dataFile();
+    const raw=await fs.promises.readFile(p,'utf8');
+    const current=JSON.parse(raw);
+    if(!Array.isArray(current.transactions))throw Error('Invalid transaction database');
+    const before=current.transactions.length;
+    current.transactions=current.transactions.filter(t=>t.id!==id);
+    if(current.transactions.length===before)return{ok:false,error:'Transaction not found; refresh the app'};
+    if(current.receipts&&typeof current.receipts==='object')delete current.receipts[id];
+    const tmp=p+'.delete-'+process.pid+'.tmp';
+    await fs.promises.writeFile(tmp,JSON.stringify(current),{mode:0o600});
+    await fs.promises.rename(tmp,p);
+    scheduleBackup();
+    return{ok:true};
+  }catch(err){return{ok:false,error:err.message}}
+ });
  ipcMain.handle('finance:save-async',async(_e,raw)=>{try{const p=dataFile(),tmp=p+'.async-tmp';await fs.promises.mkdir(path.dirname(p),{recursive:true});await fs.promises.writeFile(tmp,raw,{encoding:'utf8',mode:0o600});await fs.promises.rename(tmp,p);scheduleBackup();return{ok:true}}catch(err){return{ok:false,error:err.message}}});
  ipcMain.on('finance:read-sync',e=>{try{e.returnValue={ok:true,data:readFinanceData()}}catch(err){e.returnValue={ok:false,error:err.message}}});
  ipcMain.on('finance:save-sync',(e,raw)=>{try{e.returnValue=storeFinanceData(raw);scheduleBackup()}catch(err){e.returnValue={ok:false,error:err.message}}});
