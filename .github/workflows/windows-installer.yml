@@ -29,7 +29,8 @@ jobs:
           node --check main.js
           node --check preload.js
       - name: Build real NSIS installer
-        run: npx electron-builder --win nsis portable --x64 --publish never
+        run: npx electron-builder --win nsis --x64 --publish never
+          npx electron-builder --win portable --x64 --publish never --config.artifactName='ProfitPilot Portable ${version}.${ext}'
       - name: Confirm Setup.exe (not unpacked app)
         shell: pwsh
         run: |
