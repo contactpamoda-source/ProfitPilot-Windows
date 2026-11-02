@@ -28,9 +28,16 @@ jobs:
         run: |
           node --check main.js
           node --check preload.js
-      - name: Build real NSIS installer
-        run: npx electron-builder --win nsis --x64 --publish never
-          npx electron-builder --win portable --x64 --publish never --config.artifactName='ProfitPilot Portable ${version}.${ext}'
+      - name: Build Windows Setup installer
+        shell: pwsh
+        run: |
+          npx electron-builder --win nsis --x64 --publish never
+          if ($LASTEXITCODE -ne 0) { throw 'NSIS Setup build failed' }
+      - name: Build portable Windows app
+        shell: pwsh
+        run: |
+          npx electron-builder --win portable --x64 --publish never '--config.artifactName=ProfitPilot Portable ${version}.${ext}'
+          if ($LASTEXITCODE -ne 0) { throw 'Portable build failed' }
       - name: Confirm Setup.exe (not unpacked app)
         shell: pwsh
         run: |
