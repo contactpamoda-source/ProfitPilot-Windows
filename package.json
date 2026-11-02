@@ -1,0 +1,48 @@
+{
+  "name": "profitpilot-trydesigns",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ProfitPilot Windows Desktop Finance Tracker by TryDesigns",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist:win": "electron-builder --win nsis --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "^33.4.11",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.trydesigns.profitpilot",
+    "productName": "ProfitPilot",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "assets/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "perMachine": false,
+      "allowElevation": true
+    },
+    "artifactName": "ProfitPilot Setup ${version}.${ext}",
+    "asar": true
+  }
+}
