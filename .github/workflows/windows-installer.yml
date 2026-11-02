@@ -1,4 +1,4 @@
-name: Build ProfitPilot Setup EXE
+name: Build ProfitPilot Setup and Portable
 on:
   workflow_dispatch:
   push:
@@ -29,7 +29,7 @@ jobs:
           node --check main.js
           node --check preload.js
       - name: Build real NSIS installer
-        run: npx electron-builder --win nsis --x64 --publish never
+        run: npx electron-builder --win nsis portable --x64 --publish never
       - name: Confirm Setup.exe (not unpacked app)
         shell: pwsh
         run: |
@@ -45,5 +45,21 @@ jobs:
         with:
           name: ProfitPilot-Setup-Windows
           path: dist/*Setup*.exe
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Verify portable application
+        shell: pwsh
+        run: |
+          $portable = @(Get-ChildItem dist -File -Filter '*.exe' | Where-Object { $_.Name -match 'Portable' })
+          if ($portable.Count -lt 1) {
+            Get-ChildItem dist -File | Select-Object Name
+            throw 'Portable EXE was not generated.'
+          }
+      - name: Upload portable app for no-install testing
+        uses: actions/upload-artifact@v4
+        with:
+          name: ProfitPilot-Portable-No-Install
+          path: dist/*Portable*.exe
           if-no-files-found: error
           retention-days: 30
