@@ -32,7 +32,8 @@
             "x64"
           ]
         }
-      ]
+      ],
+      "icon": "assets/profitpilot-icon.ico"
     },
     "nsis": {
       "oneClick": false,
@@ -40,7 +41,9 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "perMachine": false,
-      "allowElevation": true
+      "allowElevation": true,
+      "installerIcon": "assets/profitpilot-icon.ico",
+      "uninstallerIcon": "assets/profitpilot-icon.ico"
     },
     "artifactName": "ProfitPilot Setup ${version}.${ext}",
     "asar": true
