@@ -2,7 +2,7 @@ const {app,BrowserWindow,ipcMain,shell,dialog}=require('electron');
 const fs=require('fs'),path=require('path');
 let mainWindow=null,backupTimer=null,lastBackupAt=0;
 function createWindow(){
- mainWindow=new BrowserWindow({width:1320,height:850,minWidth:900,minHeight:600,backgroundColor:'#f5faf9',show:false,webPreferences:{preload:path.join(__dirname,'preload.js'),nodeIntegration:false,contextIsolation:true,sandbox:false}});
+ mainWindow=new BrowserWindow({width:1320,height:850,minWidth:900,minHeight:600,backgroundColor:'#f5faf9',icon:path.join(__dirname,'assets','profitpilot-icon.png'),show:false,webPreferences:{preload:path.join(__dirname,'preload.js'),nodeIntegration:false,contextIsolation:true,sandbox:false}});
  mainWindow.once('ready-to-show',()=>{if(mainWindow&&!mainWindow.isDestroyed())mainWindow.show()});
  mainWindow.on('closed',()=>{mainWindow=null});
  mainWindow.webContents.setWindowOpenHandler(({url})=>{if(/^https?:\/\//i.test(url))shell.openExternal(url).catch(console.error);return{action:'deny'}});
