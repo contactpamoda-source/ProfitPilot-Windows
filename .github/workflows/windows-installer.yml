@@ -60,7 +60,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ProfitPilot-Browser-Preview-No-EXE
-          path: index.html
+          path: |
+            index.html
+            assets/report-xlsx.js
           if-no-files-found: error
           retention-days: 30
       - name: Upload installer only
