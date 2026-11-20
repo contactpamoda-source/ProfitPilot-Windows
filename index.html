@@ -100,7 +100,7 @@ function buildStatement(){
   }
   return {inward:0,outward:0,invalid:true};
  };
- const earlier=relevant.filter(t=>!bounds.start||String(t.date||'')<bounds.start);
+ const earlier=bounds.start?relevant.filter(t=>String(t.date||'')<bounds.start):[];
  const openingBalance=earlier.reduce((s,t)=>{const v=movements(t);return s+v.inward-v.outward},opening);
  const sorted=relevant.filter(t=>(!bounds.start||String(t.date||'')>=bounds.start)&&(!bounds.end||String(t.date||'')<=bounds.end))
  .sort((a,b)=>String(a.date||'').localeCompare(String(b.date||''))||String(a.created||'').localeCompare(String(b.created||''))||String(a.id||'').localeCompare(String(b.id||'')));
